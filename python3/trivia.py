@@ -19,10 +19,7 @@ class Game:
             self.pop_questions.append("Pop Question %s" % i)
             self.science_questions.append("Science Question %s" % i)
             self.sports_questions.append("Sports Question %s" % i)
-            self.rock_questions.append(self.create_rock_question(i))
-
-    def create_rock_question(self, index):
-        return "Rock Question %s" % index
+            self.rock_questions.append("Rock Question %s" % i)
 
     def is_playable(self):
         return self.how_many_players >= 2
@@ -32,7 +29,7 @@ class Game:
         self.places[self.how_many_players] = 0
         self.purses[self.how_many_players] = 0
         self.in_penalty_box[self.how_many_players] = False
-
+        
         print(player_name + " was added")
         print("They are player number %s" % len(self.players))
 
@@ -51,28 +48,28 @@ class Game:
                 self.is_getting_out_of_penalty_box = True
 
                 print("%s is getting out of the penalty box" % self.players[self.current_player])
-                self.places[self.current_player] = self.places[self.current_player] + roll
-                if self.places[self.current_player] > 11:
-                    self.places[self.current_player] = self.places[self.current_player] - 12
+                self.wraparound(roll)
 
-                print(self.players[self.current_player] + \
-                            '\'s new location is ' + \
-                            str(self.places[self.current_player]))
-                print("The category is %s" % self._current_category)
-                self._ask_question()
+                self.getnewquestion()
             else:
                 print("%s is not getting out of the penalty box" % self.players[self.current_player])
                 self.is_getting_out_of_penalty_box = False
         else:
-            self.places[self.current_player] = self.places[self.current_player] + roll
-            if self.places[self.current_player] > 11:
-                self.places[self.current_player] = self.places[self.current_player] - 12
+            self.wraparound(roll)
 
-            print(self.players[self.current_player] + \
+            self.getnewquestion()
+
+    def wraparound(self, roll):
+        self.places[self.current_player] = self.places[self.current_player] + roll
+        if self.places[self.current_player] > 11:
+            self.places[self.current_player] = self.places[self.current_player] - 12
+
+    def getnewquestion(self):
+        print(self.players[self.current_player] + \
                         '\'s new location is ' + \
                         str(self.places[self.current_player]))
-            print("The category is %s" % self._current_category)
-            self._ask_question()
+        print("The category is %s" % self._current_category)
+        self._ask_question()
 
     def _ask_question(self):
         if self._current_category == 'Pop': print(self.pop_questions.pop(0))
@@ -96,54 +93,49 @@ class Game:
     def was_correctly_answered(self):
         if self.in_penalty_box[self.current_player]:
             if self.is_getting_out_of_penalty_box:
-                print('Answer was correct!!!!')
-                self.purses[self.current_player] += 1
-                print(self.players[self.current_player] + \
-                    ' now has ' + \
-                    str(self.purses[self.current_player]) + \
-                    ' Gold Coins.')
+                self.displayinfo()
 
                 winner = self._did_player_win()
-                self.current_player += 1
-                if self.current_player == len(self.players): self.current_player = 0
+                self.newplayer()
 
                 return winner
             else:
-                self.current_player += 1
-                if self.current_player == len(self.players): self.current_player = 0
+                self.newplayer()
                 return True
 
 
 
         else:
 
-            print("Answer was corrent!!!!")
-            self.purses[self.current_player] += 1
-            print(self.players[self.current_player] + \
-                ' now has ' + \
-                str(self.purses[self.current_player]) + \
-                ' Gold Coins.')
+            self.displayinfo()
 
             winner = self._did_player_win()
-            self.current_player += 1
-            if self.current_player == len(self.players): self.current_player = 0
+            self.newplayer()
 
             return winner
+
+    def displayinfo(self):
+        print('Answer was correct!!!!')
+        self.purses[self.current_player] += 1
+        print(self.players[self.current_player] + \
+                    ' now has ' + \
+                    str(self.purses[self.current_player]) + \
+                    ' Gold Coins.')
+
+    def newplayer(self):
+        self.current_player += 1
+        if self.current_player == len(self.players): self.current_player = 0
 
     def wrong_answer(self):
         print('Question was incorrectly answered')
         print(self.players[self.current_player] + " was sent to the penalty box")
         self.in_penalty_box[self.current_player] = True
 
-        self.current_player += 1
-        if self.current_player == len(self.players): self.current_player = 0
+        self.newplayer()
         return True
 
     def _did_player_win(self):
         return not (self.purses[self.current_player] == 6)
-
-
-from random import randrange
 
 if __name__ == '__main__':
     not_a_winner = False
@@ -154,12 +146,20 @@ if __name__ == '__main__':
     game.add('Pat')
     game.add('Sue')
 
-    while True:
-        game.roll(randrange(5) + 1)
+    role_sequence = [2, 5, 3, 2, 1, 4, 3, 4, 3, 4, 3]
 
-        if randrange(9) == 7:
+    while True:
+        i=0
+        game.roll(role_sequence[i])
+
+        if role_sequence[9] == 7:
             not_a_winner = game.wrong_answer()
         else:
             not_a_winner = game.was_correctly_answered()
 
         if not not_a_winner: break
+        i+=1 
+
+
+# python trivia.py > test2.txt
+# diff test1.txt test2.txt
