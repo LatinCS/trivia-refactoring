@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 class Game:
+    #setting up game
     def __init__(self):
         self.players = []
         self.places = [0] * 6
@@ -21,24 +22,29 @@ class Game:
             self.sports_questions.append("Sports Question %s" % i)
             self.rock_questions.append("Rock Question %s" % i)
 
+    @property
+    def how_many_players(self):
+        return len(self.players)
+
     def is_playable(self):
         return self.how_many_players >= 2
-
+    #
+    #add players
     def add(self, player_name):
         self.players.append(player_name)
         self.places[self.how_many_players] = 0
         self.purses[self.how_many_players] = 0
         self.in_penalty_box[self.how_many_players] = False
         
-        print(player_name + " was added")
-        print("They are player number %s" % len(self.players))
+        self.announce_player(player_name)
 
         return True
 
-    @property
-    def how_many_players(self):
-        return len(self.players)
-
+    def announce_player(self, player_name):
+        print(player_name + " was added")
+        print("They are player number %s" % len(self.players))
+    #
+    #roll function
     def roll(self, roll):
         print("%s is the current player" % self.players[self.current_player])
         print("They have rolled a %s" % roll)
@@ -70,7 +76,8 @@ class Game:
                         str(self.places[self.current_player]))
         print("The category is %s" % self._current_category)
         self._ask_question()
-
+    #
+    #asking question
     def _ask_question(self):
         if self._current_category == 'Pop': print(self.pop_questions.pop(0))
         if self._current_category == 'Science': print(self.science_questions.pop(0))
@@ -89,7 +96,8 @@ class Game:
         if self.places[self.current_player] == 6: return 'Sports'
         if self.places[self.current_player] == 10: return 'Sports'
         return 'Rock'
-
+    #
+    #evaluate answer
     def was_correctly_answered(self):
         if self.in_penalty_box[self.current_player]:
             if self.is_getting_out_of_penalty_box:
@@ -136,7 +144,8 @@ class Game:
 
     def _did_player_win(self):
         return not (self.purses[self.current_player] == 6)
-
+    #
+#run game
 if __name__ == '__main__':
     not_a_winner = False
 
@@ -159,7 +168,7 @@ if __name__ == '__main__':
 
         if not not_a_winner: break
         i+=1 
-
-
+#
+#golden master testing terminal commands
 # python trivia.py > test2.txt
 # diff test1.txt test2.txt
