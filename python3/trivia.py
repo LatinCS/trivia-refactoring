@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-class Game:
+class Game(object):
     #setting up game
     def __init__(self):
         self.players = []
@@ -104,6 +104,7 @@ class Game:
                 self.displayinfo()
 
                 winner = self._did_player_win()
+                self.announce_winner(winner)
                 self.newplayer()
 
                 return winner
@@ -118,9 +119,14 @@ class Game:
             self.displayinfo()
 
             winner = self._did_player_win()
+            self.announce_winner(winner)
             self.newplayer()
 
             return winner
+
+    def announce_winner(self, winner):
+        if winner == False:
+            print("%s is the winner!" % self.players[self.current_player])
 
     def displayinfo(self):
         print('Answer was correct!!!!')
@@ -145,6 +151,7 @@ class Game:
     def _did_player_win(self):
         return not (self.purses[self.current_player] == 6)
     #
+
 #run game
 if __name__ == '__main__':
     not_a_winner = False
